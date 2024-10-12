@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Video Player with Download and Audio Mode</title>
+    <!-- FontAwesome Icons -->
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      :root {
+        --background-light: #f4f4f9;
+        --background-dark: #2b2b2b;
+        --text-light: #333;
+        --text-dark: #f1f1f1;
+        --primary-light: #007bff;
+        --primary-dark: #90caf9;
+        --button-light: #ff5722;
+        --button-dark: #ff8a50;
+        --audio-button-light: #4caf50;
+        --audio-button-dark: #81c784;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background: var(--background-light);
+        color: var(--text-light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .container {
+        text-align: center;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 100%;
+        transition: background-color 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      h1 {
+        color: var(--primary-light);
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        transition: color 0.3s ease;
+      }
+
+      .input-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      input[type="text"] {
+        flex-grow: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-light);
+      }
+
+      button {
+        background-color: rgb(24, 150, 182);
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      button i {
+        margin-right: 8px;
+      }
+
+      button:hover {
+        background-color: var(--button-dark);
+      }
+
+      /* Audio Button */
+      .audio-button {
+        background-color: var(--audio-button-light);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .audio-button i {
+        margin-right: 8px;
+      }
+
+      .audio-button:hover {
+        background-color: var(--audio-button-dark);
+      }
+
+      #player {
+        max-width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        position: relative;
+        margin-top: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: height 0.3s ease;
+      }
+
+      #player iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      /* Dark Mode */
+      body.dark-mode {
+        background: var(--background-dark);
+        color: var(--text-dark);
+      }
+
+      .dark-mode .container {
+        background-color: #3c3c3c;
+      }
+
+      .dark-mode h1 {
+        color: var(--primary-dark);
+      }
+
+      .dark-mode input[type="text"] {
+        background-color: #444;
+        color: var(--text-dark);
+        border-color: #555;
+      }
+
+      .dark-mode input[type="text"]:focus {
+        border-color: var(--primary-dark);
+      }
+
+      .dark-mode button {
+        background-color: var(--button-dark);
+      }
+
+      .dark-mode button:hover {
+        background-color: #ff7043;
+      }
+
+      .dark-mode .audio-button {
+        background-color: var(--audio-button-dark);
+      }
+
+      .dark-mode .audio-button:hover {
+        background-color: #66bb6a;
+      }
+
+      /* Toggle Button */
+      .toggle-mode-btn {
+        background-color: var(--primary-light);
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 15px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .toggle-mode-btn i {
+        margin-right: 8px;
+      }
+
+      .dark-mode .toggle-mode-btn {
+        background-color: var(--primary-dark);
+      }
+
+      /* Download Button */
+      .download-button {
+        background-color: rgb(205, 26, 178);
+        padding: 10px 15px;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .download-button i {
+        margin-right: 8px;
+      }
+
+      .download-button:hover {
+        background-color: #64b5f6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>BSK YOUTUBE V/A PLAYER</h1>
+      <div class="input-container">
+        <input
+          type="text"
+          id="videoURL"
+          placeholder="Paste YouTube video or live stream URL here"
+        />
+        <button onclick="loadVideo()">
+          <i class="fas fa-play-circle"></i>Load Video
+        </button>
+      </div>
+      <div id="player">
+        <iframe
+          id="videoPlayer"
+          src=""
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <button class="toggle-mode-btn" onclick="toggleMode()">
+        <i class="fas fa-adjust"></i>Switch to Dark Mode
+      </button>
+      <button class="audio-button" onclick="toggleAudioMode()">
+        <i class="fas fa-headphones-alt"></i>Switch to Audio Mode
+      </button>
+      <a id="downloadButton" class="download-button" href="#" target="_blank"
+        ><i class="fas fa-download"></i>Download Video</a
+      >
+    </div>
+
+    <script>
+      let isAudioOnly = false;
+
+      function loadVideo() {
+        var url = document.getElementById("videoURL").value;
+        var videoId = getVideoID(url);
+        if (videoId) {
+          var embedUrl =
+            "https://www.youtube.com/embed/" +
+            videoId +
+            "?autoplay=1&playsinline=1";
+          document.getElementById("videoPlayer").src = embedUrl;
+          setDownloadLink(videoId); // Set download link
+        } else {
+          alert("Invalid YouTube URL");
+        }
+      }
+
+      function getVideoID(url) {
+        var videoId = null;
+        var regex =
+          /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:live\/|watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        var match = url.match(regex);
+        if (match) {
+          videoId = match[1];
+        }
+        return videoId;
+      }
+
+      function toggleMode() {
+        var bodyElement = document.body;
+        var button = document.querySelector(".toggle-mode-btn");
+        if (bodyElement.classList.contains("dark-mode")) {
+          bodyElement.classList.remove("dark-mode");
+          button.innerHTML = '<i class="fas fa-adjust"></i>Switch to Dark Mode';
+        } else {
+          bodyElement.classList.add("dark-mode");
+          button.innerHTML =
+            '<i class="fas fa-adjust"></i>Switch to Light Mode';
+        }
+      }
+
+      function toggleAudioMode() {
+        var playerElement = document.getElementById("player");
+        if (isAudioOnly) {
+          // Switch back to video mode
+          playerElement.style.display = "block";
+          isAudioOnly = false;
+          document.querySelector(".audio-button").innerHTML =
+            '<i class="fas fa-headphones-alt"></i>Switch to Audio Mode';
+        } else {
+          // Switch to audio mode
+          playerElement.style.display = "none";
+          isAudioOnly = true;
+          document.querySelector(".audio-button").innerHTML =
+            '<i class="fas fa-headphones-alt"></i>Switch to Video Mode';
+        }
+      }
+
+      function setDownloadLink(videoId) {
+        var downloadUrl = "https://www.y2mate.com/youtube/" + videoId; // Example using y2mate
+        document.getElementById("downloadButton").href = downloadUrl;
+      }
+    </script>
+  </body>
+</html>
